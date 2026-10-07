@@ -1,0 +1,20 @@
+INSERT INTO categories (name, slug, sort_order) VALUES
+('Rice & Curry', 'rice-and-curry', 1),
+('Kottu & Noodles', 'kottu-and-noodles', 2),
+('Burgers & Wraps', 'burgers-and-wraps', 3),
+('Beverages', 'beverages', 4),
+('Desserts', 'desserts', 5);
+
+INSERT INTO products (category_id, name, slug, description, price, image_url, stock_quantity, featured) VALUES
+((SELECT id FROM categories WHERE slug = 'rice-and-curry'), 'Ceylon Chicken Rice', 'ceylon-chicken-rice', 'Fragrant samba rice with pepper chicken, dhal, tempered vegetables, coconut sambol and crisp papadam.', 1450.00, 'https://images.unsplash.com/photo-1601050690597-df0568f70950?auto=format&fit=crop&w=1200&q=80', 35, TRUE),
+((SELECT id FROM categories WHERE slug = 'rice-and-curry'), 'Jaffna Crab Curry', 'jaffna-crab-curry', 'Spiced lagoon crab curry served with steamed rice, aubergine moju and fresh cucumber salad.', 2850.00, 'https://images.unsplash.com/photo-1565557623262-b51c2513a641?auto=format&fit=crop&w=1200&q=80', 12, TRUE),
+((SELECT id FROM categories WHERE slug = 'rice-and-curry'), 'Garden Vegetable Curry', 'garden-vegetable-curry', 'A generous vegan plate of red rice, cashew curry, dhal, beetroot and seasonal greens.', 1150.00, 'https://images.unsplash.com/photo-1547592180-85f173990554?auto=format&fit=crop&w=1200&q=80', 28, FALSE),
+((SELECT id FROM categories WHERE slug = 'kottu-and-noodles'), 'Classic Chicken Kottu', 'classic-chicken-kottu', 'Chopped godamba roti tossed on the griddle with chicken, egg, vegetables and aromatic curry gravy.', 1350.00, 'https://images.unsplash.com/photo-1631515243349-e0cb75fb8d3a?auto=format&fit=crop&w=1200&q=80', 30, TRUE),
+((SELECT id FROM categories WHERE slug = 'kottu-and-noodles'), 'Cheese Kottu Royale', 'cheese-kottu-royale', 'Creamy chicken kottu layered with melted cheese, spring onion and our roasted chilli sauce.', 1750.00, 'https://images.unsplash.com/photo-1512058564366-18510be2db19?auto=format&fit=crop&w=1200&q=80', 22, TRUE),
+((SELECT id FROM categories WHERE slug = 'kottu-and-noodles'), 'Wok-Fired Seafood Noodles', 'wok-fired-seafood-noodles', 'Egg noodles with prawns, cuttlefish, vegetables and a citrus soy glaze.', 1850.00, 'https://images.unsplash.com/photo-1585032226651-759b368d7246?auto=format&fit=crop&w=1200&q=80', 18, FALSE),
+((SELECT id FROM categories WHERE slug = 'burgers-and-wraps'), 'Pantry Chicken Burger', 'pantry-chicken-burger', 'Crispy chicken, caramelised onion, lettuce and house pickle mayo in a toasted brioche bun.', 1550.00, 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=1200&q=80', 25, TRUE),
+((SELECT id FROM categories WHERE slug = 'burgers-and-wraps'), 'Spiced Paneer Wrap', 'spiced-paneer-wrap', 'Charred paneer, crunchy slaw, tomato and mint yoghurt wrapped in soft flatbread.', 1250.00, 'https://images.unsplash.com/photo-1565299507177-b0ac66763828?auto=format&fit=crop&w=1200&q=80', 20, FALSE),
+((SELECT id FROM categories WHERE slug = 'beverages'), 'Ceylon Iced Tea', 'ceylon-iced-tea', 'Cold-brewed Ceylon tea brightened with lime, mint and a touch of kithul.', 450.00, 'https://images.unsplash.com/photo-1556679343-c7306c1976bc?auto=format&fit=crop&w=1200&q=80', 50, FALSE),
+((SELECT id FROM categories WHERE slug = 'beverages'), 'King Coconut Cooler', 'king-coconut-cooler', 'Fresh king coconut with lime, basil seeds and crushed ice.', 550.00, 'https://images.unsplash.com/photo-1546173159-315724a31696?auto=format&fit=crop&w=1200&q=80', 40, TRUE),
+((SELECT id FROM categories WHERE slug = 'desserts'), 'Watalappan Silk', 'watalappan-silk', 'A silky coconut custard scented with jaggery, cardamom and nutmeg, finished with cashews.', 650.00, 'https://images.unsplash.com/photo-1551024506-0bccd828d307?auto=format&fit=crop&w=1200&q=80', 24, TRUE),
+((SELECT id FROM categories WHERE slug = 'desserts'), 'Coconut Treacle Cheesecake', 'coconut-treacle-cheesecake', 'Baked coconut cheesecake with kithul treacle, toasted coconut and a ginger crumb.', 850.00, 'https://images.unsplash.com/photo-1578985545062-69928b1d9587?auto=format&fit=crop&w=1200&q=80', 16, FALSE);

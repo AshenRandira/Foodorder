@@ -1,0 +1,11 @@
+export type Category = { id: number; name: string; slug: string; active: boolean; sortOrder: number }
+export type Product = { id: number; name: string; slug: string; description: string; price: number; imageUrl: string; stockQuantity: number; available: boolean; active: boolean; featured: boolean; category: Category }
+export type CartLine = { product: Product; quantity: number }
+export type PaymentMethod = 'PAYHERE' | 'WHATSAPP'
+export type PaymentStatus = 'AWAITING_PAYMENT' | 'PENDING' | 'PAID' | 'FAILED' | 'CANCELLED' | 'CHARGEBACK' | 'NOT_APPLICABLE'
+export type FulfillmentStatus = 'AWAITING_PAYMENT' | 'AWAITING_CONFIRMATION' | 'CONFIRMED' | 'PREPARING' | 'READY' | 'OUT_FOR_DELIVERY' | 'COMPLETED' | 'CANCELLED'
+export type OrderItem = { productId: number; productName: string; unitPrice: number; quantity: number; lineTotal: number }
+export type Order = { reference: string; customerName: string; phone: string; email?: string; deliveryAddress: string; notes?: string; paymentMethod: PaymentMethod; paymentStatus: PaymentStatus; fulfillmentStatus: FulfillmentStatus; subtotal: number; deliveryFee: number; total: number; currency: string; items: OrderItem[]; createdAt: string }
+export type PayHereCheckout = { actionUrl: string; fields: Record<string, string>; configured: boolean; configurationMessage?: string }
+export type CheckoutResponse = { order: Order; accessToken: string; payHere?: PayHereCheckout; whatsappUrl?: string }
+export type ApiError = { code?: string; message?: string; fieldErrors?: Record<string, string> }

@@ -1,0 +1,63 @@
+services:
+  db:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-plate_pantry}
+      POSTGRES_USER: ${POSTGRES_USER:-plate_pantry}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-plate_pantry}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-plate_pantry} -d ${POSTGRES_DB:-plate_pantry}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build:
+      context: ./backend
+    restart: unless-stopped
+    environment:
+      DB_URL: jdbc:postgresql://db:5432/${POSTGRES_DB:-plate_pantry}
+      DB_USERNAME: ${POSTGRES_USER:-plate_pantry}
+      DB_PASSWORD: ${POSTGRES_PASSWORD:-plate_pantry}
+      ADMIN_USERNAME: ${ADMIN_USERNAME:-admin}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-change-me-now-123}
+      FRONTEND_ORIGINS: ${FRONTEND_ORIGINS:-http://localhost:5173}
+      SESSION_COOKIE_SECURE: ${SESSION_COOKIE_SECURE:-false}
+      PAYHERE_MERCHANT_ID: ${PAYHERE_MERCHANT_ID:-}
+      PAYHERE_MERCHANT_SECRET: ${PAYHERE_MERCHANT_SECRET:-}
+      PAYHERE_NOTIFY_URL: ${PAYHERE_NOTIFY_URL:-http://localhost:8080/api/payments/payhere/notify}
+      PAYHERE_RETURN_URL: ${PAYHERE_RETURN_URL:-http://localhost:5173/order/return}
+      PAYHERE_CANCEL_URL: ${PAYHERE_CANCEL_URL:-http://localhost:5173/checkout}
+      WHATSAPP_BUSINESS_NUMBER: ${WHATSAPP_BUSINESS_NUMBER:-94770000000}
+      DELIVERY_FEE_LKR: ${DELIVERY_FEE_LKR:-350.00}
+    ports:
+      - "8080:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8080/api/menu/categories >/dev/null || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 20s
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        VITE_API_URL: /api
+    restart: unless-stopped
+    ports:
+      - "5173:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+
+volumes:
+  postgres_data:

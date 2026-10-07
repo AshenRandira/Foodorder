@@ -1,0 +1,2 @@
+package com.plateandpantry.domain;
+public enum FulfillmentStatus { AWAITING_PAYMENT, AWAITING_CONFIRMATION, CONFIRMED, PREPARING, READY, OUT_FOR_DELIVERY, COMPLETED, CANCELLED }

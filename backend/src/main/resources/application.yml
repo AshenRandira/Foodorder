@@ -1,0 +1,42 @@
+spring:
+  application:
+    name: plate-and-pantry
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/plate_pantry}
+    username: ${DB_USERNAME:plate_pantry}
+    password: ${DB_PASSWORD:plate_pantry}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+  flyway:
+    enabled: true
+  jackson:
+    default-property-inclusion: non_null
+server:
+  port: ${PORT:8080}
+  servlet:
+    session:
+      cookie:
+        http-only: true
+        secure: ${SESSION_COOKIE_SECURE:false}
+        same-site: lax
+      timeout: 4h
+app:
+  frontend-origins: ${FRONTEND_ORIGINS:http://localhost:5173}
+  delivery-fee: ${DELIVERY_FEE_LKR:350.00}
+  admin:
+    username: ${ADMIN_USERNAME:}
+    password: ${ADMIN_PASSWORD:}
+  whatsapp-number: ${WHATSAPP_BUSINESS_NUMBER:94770000000}
+  payhere:
+    merchant-id: ${PAYHERE_MERCHANT_ID:}
+    merchant-secret: ${PAYHERE_MERCHANT_SECRET:}
+    checkout-url: ${PAYHERE_CHECKOUT_URL:https://sandbox.payhere.lk/pay/checkout}
+    notify-url: ${PAYHERE_NOTIFY_URL:http://localhost:8080/api/payments/payhere/notify}
+    return-url: ${PAYHERE_RETURN_URL:http://localhost:5173/order/return}
+    cancel-url: ${PAYHERE_CANCEL_URL:http://localhost:5173/checkout}
