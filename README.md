@@ -284,7 +284,7 @@ Visual browser QA remains unverified because the available browser-control conne
 6. Keep SPA fallback routing enabled so `/menu/:id`, `/order/:reference`, and `/admin/*` load correctly on refresh.
 7. Verify a real PayHere Sandbox callback in provider logs and the database before presenting the payment flow as tested.
 
-No cloud resources, repository pushes, or paid services were created by this implementation.
+The source is published at `https://github.com/AshenRandira/Foodorder`. No cloud deployment resources or paid services have been created yet.
 
 ## Assumptions and limitations
 

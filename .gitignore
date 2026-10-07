@@ -10,3 +10,6 @@ frontend/*.tsbuildinfo
 .env
 *.log
 .DS_Store
+.env.*
+.neon
+node_modules/
