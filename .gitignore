@@ -3,7 +3,9 @@ frontend/node_modules/
 frontend/dist/
 frontend/*.tsbuildinfo
 .idea/
-.vscode/
+.vscode/*
+!.vscode/settings.json
+!.vscode/extensions.json
 *.iml
 .env
 *.log
