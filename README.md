@@ -34,7 +34,7 @@ The repository is a modular monolith with one React frontend, one Spring Boot ba
 | Layer | Technology |
 | --- | --- |
 | Frontend | React 19, TypeScript 7, Vite 8, Tailwind CSS 4, React Router 7, Axios |
-| Backend | Java 21 target, Spring Boot 3.5.16, Spring MVC, Spring Data JPA, Spring Security |
+| Backend | Java 21 target, Spring Boot 4.1.1, Spring MVC, Spring Data JPA, Spring Security |
 | Database | PostgreSQL 17, Flyway migrations |
 | Authentication | Server-side session, HttpOnly cookie, BCrypt cost 12, CSRF cookie/header |
 | Testing | JUnit 5, Mockito, MockMvc, Vitest, Testing Library |
