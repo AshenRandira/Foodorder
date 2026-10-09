@@ -1,12 +1,14 @@
 # Plate & Pantry — Remaining Development Plan
 
-Last updated: 2026-10-08
+Last updated: 2026-10-10
 
 Active development branch: `dev`
 
 Stable branch: `main`
 
 Repository: <https://github.com/AshenRandira/Foodorder>
+
+> Deployment update: Railway is the active single-container target. The root `Dockerfile` builds React and serves it from Spring Boot on the same origin. The older Render sections below are historical planning only; use the Railway section in `README.md`. The Java runtime consumes JDBC-form `DB_*` variables; Neon-managed `DATABASE_URL*` variables remain local tooling inputs and are not interchangeable with JDBC URLs.
 
 ## 1. Purpose
 
@@ -32,10 +34,12 @@ The core restaurant ordering system is implemented. The current baseline on `dev
 - [x] Administrator dashboard, catalogue management, stock management, and order workflow
 - [x] Maven project import configuration for Antigravity/VS Code
 - [x] Public GitHub repository with `main` and `dev` branches
-- [x] Backend automated tests: 11 passed, 0 failures, 0 errors
+- [x] Backend automated tests: 15 passed, 0 failures, 0 errors
 - [x] Frontend automated tests: 2 passed
 - [x] Frontend production build: passed
-- [x] Backend Docker image build: passed
+- [x] Railway single-container production image build: passed
+- [x] Same-origin SPA deep-link and API smoke tests: passed
+- [x] Disabled PayHere guard returns 503 before creating an order or reserving stock
 - [x] Live Docker/PostgreSQL verification: passed
 - [x] Both Flyway migrations applied successfully to PostgreSQL 17.11
 - [x] Live menu endpoint returned all 12 seeded products

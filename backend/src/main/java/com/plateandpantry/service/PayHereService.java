@@ -25,6 +25,7 @@ public class PayHereService {
     private final CustomerOrderRepository orders;
     private final PaymentAttemptRepository attempts;
     private final OrderService orderService;
+    private final boolean enabled;
     private final String merchantId;
     private final String merchantSecret;
     private final String checkoutUrl;
@@ -33,6 +34,7 @@ public class PayHereService {
     private final String cancelUrl;
 
     public PayHereService(CustomerOrderRepository orders, PaymentAttemptRepository attempts, OrderService orderService,
+        @Value("${app.payhere.enabled:false}") boolean enabled,
         @Value("${app.payhere.merchant-id}") String merchantId,
         @Value("${app.payhere.merchant-secret}") String merchantSecret,
         @Value("${app.payhere.checkout-url}") String checkoutUrl,
@@ -42,6 +44,7 @@ public class PayHereService {
         this.orders = orders;
         this.attempts = attempts;
         this.orderService = orderService;
+        this.enabled = enabled;
         this.merchantId = merchantId;
         this.merchantSecret = merchantSecret;
         this.checkoutUrl = checkoutUrl;
@@ -51,7 +54,7 @@ public class PayHereService {
     }
 
     public PayHereCheckout checkout(CustomerOrder order) {
-        boolean configured = !merchantId.isBlank() && !merchantSecret.isBlank() && notifyUrl.startsWith("https://");
+        boolean configured = configured();
         Map<String, String> fields = new LinkedHashMap<>();
         String[] names = order.getCustomerName().trim().split("\\s+", 2);
         String amount = money(order.getTotal());
@@ -71,8 +74,18 @@ public class PayHereService {
         fields.put("currency", order.getCurrency());
         fields.put("amount", amount);
         if (configured) fields.put("hash", md5(merchantId + order.getReference() + amount + order.getCurrency() + md5(merchantSecret)));
-        String message = configured ? null : "Set PayHere merchant credentials and a public HTTPS notification URL before using online payment.";
+        String message = configured ? null : configurationMessage();
         return new PayHereCheckout(checkoutUrl, fields, configured, message);
+    }
+
+    public boolean configured() {
+        return enabled && !merchantId.isBlank() && !merchantSecret.isBlank() && notifyUrl.startsWith("https://");
+    }
+
+    public String configurationMessage() {
+        return enabled
+            ? "PayHere requires valid Sandbox credentials and a public HTTPS notification URL."
+            : "PayHere Sandbox is unavailable in this hosted demo because the provider requires an approved domain.";
     }
 
     @Transactional
@@ -126,7 +139,7 @@ public class PayHereService {
         orderService.releaseInventory(order);
     }
     private void requireConfigured() {
-        if (merchantId.isBlank() || merchantSecret.isBlank()) throw new BusinessException(HttpStatus.SERVICE_UNAVAILABLE, "PAYHERE_NOT_CONFIGURED", "PayHere credentials are not configured.");
+        if (!configured()) throw new BusinessException(HttpStatus.SERVICE_UNAVAILABLE, "PAYHERE_NOT_CONFIGURED", configurationMessage());
     }
     private BusinessException invalid(String message) { return new BusinessException(HttpStatus.BAD_REQUEST, "INVALID_PAYHERE_CALLBACK", message); }
     private boolean constantTimeEquals(String expected, String actual) {

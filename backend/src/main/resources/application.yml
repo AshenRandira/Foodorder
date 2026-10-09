@@ -5,6 +5,8 @@ spring:
     url: ${DB_URL:jdbc:postgresql://localhost:5432/plate_pantry}
     username: ${DB_USERNAME:plate_pantry}
     password: ${DB_PASSWORD:plate_pantry}
+    hikari:
+      maximum-pool-size: ${DB_POOL_MAX_SIZE:5}
   jpa:
     hibernate:
       ddl-auto: validate
@@ -15,16 +17,20 @@ spring:
           time_zone: UTC
   flyway:
     enabled: true
+    url: ${FLYWAY_URL:${DB_URL:jdbc:postgresql://localhost:5432/plate_pantry}}
+    user: ${FLYWAY_USERNAME:${DB_USERNAME:plate_pantry}}
+    password: ${FLYWAY_PASSWORD:${DB_PASSWORD:plate_pantry}}
   jackson:
     default-property-inclusion: non_null
 server:
   port: ${PORT:8080}
+  forward-headers-strategy: framework
   servlet:
     session:
       cookie:
         http-only: true
         secure: ${SESSION_COOKIE_SECURE:false}
-        same-site: lax
+        same-site: ${SESSION_COOKIE_SAME_SITE:lax}
       timeout: 4h
 app:
   frontend-origins: ${FRONTEND_ORIGINS:http://localhost:5173}
@@ -34,6 +40,7 @@ app:
     password: ${ADMIN_PASSWORD:}
   whatsapp-number: ${WHATSAPP_BUSINESS_NUMBER:94770000000}
   payhere:
+    enabled: ${PAYHERE_ENABLED:false}
     merchant-id: ${PAYHERE_MERCHANT_ID:}
     merchant-secret: ${PAYHERE_MERCHANT_SECRET:}
     checkout-url: ${PAYHERE_CHECKOUT_URL:https://sandbox.payhere.lk/pay/checkout}

@@ -7,7 +7,7 @@ services:
       POSTGRES_USER: ${POSTGRES_USER:-plate_pantry}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-plate_pantry}
     ports:
-      - "5432:5432"
+      - "${POSTGRES_PORT:-5432}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -24,12 +24,16 @@ services:
       DB_URL: jdbc:postgresql://db:5432/${POSTGRES_DB:-plate_pantry}
       DB_USERNAME: ${POSTGRES_USER:-plate_pantry}
       DB_PASSWORD: ${POSTGRES_PASSWORD:-plate_pantry}
+      DB_POOL_MAX_SIZE: ${DB_POOL_MAX_SIZE:-5}
       ADMIN_USERNAME: ${ADMIN_USERNAME:-admin}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD:-change-me-now-123}
       FRONTEND_ORIGINS: ${FRONTEND_ORIGINS:-http://localhost:5173}
       SESSION_COOKIE_SECURE: ${SESSION_COOKIE_SECURE:-false}
+      SESSION_COOKIE_SAME_SITE: ${SESSION_COOKIE_SAME_SITE:-lax}
+      PAYHERE_ENABLED: ${PAYHERE_ENABLED:-false}
       PAYHERE_MERCHANT_ID: ${PAYHERE_MERCHANT_ID:-}
       PAYHERE_MERCHANT_SECRET: ${PAYHERE_MERCHANT_SECRET:-}
+      PAYHERE_CHECKOUT_URL: ${PAYHERE_CHECKOUT_URL:-https://sandbox.payhere.lk/pay/checkout}
       PAYHERE_NOTIFY_URL: ${PAYHERE_NOTIFY_URL:-http://localhost:8080/api/payments/payhere/notify}
       PAYHERE_RETURN_URL: ${PAYHERE_RETURN_URL:-http://localhost:5173/order/return}
       PAYHERE_CANCEL_URL: ${PAYHERE_CANCEL_URL:-http://localhost:5173/checkout}

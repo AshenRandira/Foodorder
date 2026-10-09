@@ -8,4 +8,5 @@ export type OrderItem = { productId: number; productName: string; unitPrice: num
 export type Order = { reference: string; customerName: string; phone: string; email?: string; deliveryAddress: string; notes?: string; paymentMethod: PaymentMethod; paymentStatus: PaymentStatus; fulfillmentStatus: FulfillmentStatus; subtotal: number; deliveryFee: number; total: number; currency: string; items: OrderItem[]; createdAt: string }
 export type PayHereCheckout = { actionUrl: string; fields: Record<string, string>; configured: boolean; configurationMessage?: string }
 export type CheckoutResponse = { order: Order; accessToken: string; payHere?: PayHereCheckout; whatsappUrl?: string }
+export type StoreConfig = { payHereAvailable: boolean; payHereMessage?: string }
 export type ApiError = { code?: string; message?: string; fieldErrors?: Record<string, string> }

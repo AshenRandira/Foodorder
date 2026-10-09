@@ -18,6 +18,7 @@ public class OrderController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public CheckoutResponse create(@Valid @RequestBody CreateOrderRequest request, @RequestHeader("Idempotency-Key") String key) {
+        checkout.ensureAvailable(request.paymentMethod());
         CustomerOrder order = orders.create(request, key);
         return checkout.response(order);
     }

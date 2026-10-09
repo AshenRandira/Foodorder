@@ -55,9 +55,10 @@ public class SecurityConfig {
             .csrf(c -> c.csrfTokenRepository(csrf).ignoringRequestMatchers("/api/orders/**", "/api/payments/payhere/notify"))
             .securityContext(c -> c.securityContextRepository(repository))
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers(HttpMethod.GET, "/api/menu/**", "/api/orders/**", "/api/csrf", "/api/admin/auth/session").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/menu/**", "/api/orders/**", "/api/config", "/api/csrf", "/api/admin/auth/session").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/orders", "/api/admin/auth/login", "/api/payments/payhere/notify").permitAll()
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.GET, "/", "/index.html", "/assets/**", "/favicon.ico", "/menu", "/menu/**", "/cart", "/checkout", "/order/**", "/admin", "/admin/**").permitAll()
                 .anyRequest().denyAll())
             .exceptionHandling(ex -> ex
                 .authenticationEntryPoint((req, res, error) -> writeSecurityError(res, mapper, 401, "AUTHENTICATION_REQUIRED", "Admin authentication is required."))

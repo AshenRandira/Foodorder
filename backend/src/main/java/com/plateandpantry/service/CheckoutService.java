@@ -4,12 +4,14 @@ import com.plateandpantry.domain.CustomerOrder;
 import com.plateandpantry.domain.OrderItem;
 import com.plateandpantry.domain.PaymentMethod;
 import com.plateandpantry.dto.OrderDtos.*;
+import com.plateandpantry.error.BusinessException;
 import java.math.RoundingMode;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -24,6 +26,11 @@ public class CheckoutService {
         PayHereCheckout payment = order.getPaymentMethod() == PaymentMethod.PAYHERE ? payHere.checkout(order) : null;
         String whatsapp = order.getPaymentMethod() == PaymentMethod.WHATSAPP ? whatsappUrl(order) : null;
         return new CheckoutResponse(ViewMapper.order(order), order.getAccessToken(), payment, whatsapp);
+    }
+    public void ensureAvailable(PaymentMethod paymentMethod) {
+        if (paymentMethod == PaymentMethod.PAYHERE && !payHere.configured()) {
+            throw new BusinessException(HttpStatus.SERVICE_UNAVAILABLE, "PAYHERE_NOT_CONFIGURED", payHere.configurationMessage());
+        }
     }
     private String whatsappUrl(CustomerOrder order) {
         List<String> lines = new ArrayList<>();
