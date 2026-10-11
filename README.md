@@ -1,55 +1,178 @@
 # Plate & Pantry
 
-Plate & Pantry is a responsive restaurant ordering platform built for the DartCodes Software Engineer Intern technical assessment. It includes a warm customer storefront, persistent cart, guest checkout, PayHere Sandbox handoff, WhatsApp ordering, and a protected operations dashboard for products, categories, inventory, and order fulfilment.
+![Java](https://img.shields.io/badge/Java-21-ED8B00?logo=openjdk&logoColor=white)
+![Spring Boot](https://img.shields.io/badge/Spring_Boot-4.1-6DB33F?logo=springboot&logoColor=white)
+![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=0B172A)
+![TypeScript](https://img.shields.io/badge/TypeScript-7-3178C6?logo=typescript&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-17-4169E1?logo=postgresql&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-Compose-2496ED?logo=docker&logoColor=white)
 
-The repository is a modular monolith with one React frontend, one Spring Boot backend, and one PostgreSQL database.
+Plate & Pantry is a full-stack restaurant ordering and operations platform for a Colombo-based kitchen. Customers can browse a responsive menu, manage a persistent cart, place delivery orders, continue through PayHere Sandbox or WhatsApp, and privately track an order. Restaurant staff receive a secured administration area for catalogue, inventory, order, and fulfilment management.
 
-## What is included
+The application is implemented as a modular monolith with a React frontend, a Spring Boot REST API, and PostgreSQL. The production Docker image packages the compiled frontend inside the Spring Boot application so one Railway service can serve both the website and API.
 
-### Customer storefront
+## Live links
 
-- Responsive home page with restaurant identity, featured dishes, categories, and strong food imagery
-- Searchable and filterable menu with live availability and stock indicators
-- Product details with quantity selection and stock-aware cart additions
-- React Context cart persisted in `localStorage`
-- Quantity editing, removal, subtotal, LKR 350 delivery fee, and total summary
-- Guest delivery form with validation and optional notes
-- PayHere Sandbox redirect checkout using a backend-generated hash
-- WhatsApp order enquiry using a backend-generated, URL-encoded message
-- Private order status page protected by an unguessable access token
-- Loading, empty, error, success, sold-out, and configuration-required states
+- **Live application:** [foodorder-production-ec70.up.railway.app](https://foodorder-production-ec70.up.railway.app)
+- **Source repository:** [github.com/AshenRandira/Foodorder](https://github.com/AshenRandira/Foodorder)
+- **Admin login:** [foodorder-production-ec70.up.railway.app/admin/login](https://foodorder-production-ec70.up.railway.app/admin/login)
 
-### Admin console
+> PayHere is disabled in the public demo until an approved domain and domain-specific Sandbox secret are available. The integration and callback-verification logic remain implemented and testable. No payment is simulated as successful when PayHere is unavailable.
 
-- Session-based login and logout with no customer registration
-- Dashboard for total/today orders, paid sales, kitchen queue, and low stock
-- Create and edit categories, including visibility and sort order
-- Create, edit, feature, restock, and deactivate products
-- Search and filter orders by reference, customer, phone, or fulfilment status
-- Order item, customer, delivery, payment method, and payment status views
-- Server-validated fulfilment transitions
+### Demo administrator
 
-## Technology
+The administration interface includes a **Use demo credentials** button that fills these public portfolio credentials automatically:
 
-| Layer | Technology |
+```text
+Username: demo
+Password: PlatePantryDemo2026!
+```
+
+The demo account is a normal administrator account with access to the dashboard, catalogue, inventory, and order-management features. It is intended only for this dummy portfolio environment, and its data may be changed or reset during demonstrations.
+
+## Contents
+
+- [Features](#features)
+- [Technology stack](#technology-stack)
+- [Architecture](#architecture)
+- [Project structure](#project-structure)
+- [Getting started](#getting-started)
+- [Environment configuration](#environment-configuration)
+- [Available commands](#available-commands)
+- [API overview](#api-overview)
+- [Order and payment design](#order-and-payment-design)
+- [Security](#security)
+- [Testing](#testing)
+- [Deployment](#deployment)
+- [Known limitations](#known-limitations)
+
+## Features
+
+### Customer experience
+
+- Responsive, mobile-first restaurant storefront
+- Featured dishes, cuisine categories, search, and menu filtering
+- Product pages with price, availability, stock, and quantity controls
+- Persistent cart backed by browser `localStorage`
+- Backend-validated guest checkout and delivery information
+- Server-calculated prices, delivery fee, line totals, and order total
+- PayHere Sandbox checkout with backend-generated hashes
+- WhatsApp ordering with a backend-generated, URL-encoded message
+- Private order tracking through an unguessable access token
+- Clear loading, empty, unavailable, sold-out, validation, and error states
+
+### Restaurant administration
+
+- Session-based administrator authentication
+- Dashboard for orders, sales, kitchen queue, and low-stock items
+- Category creation, visibility, ordering, and editing
+- Product creation, editing, featuring, restocking, and deactivation
+- Order search and filtering
+- Customer, delivery, item, payment, and fulfilment views
+- Server-controlled fulfilment status transitions
+- Stock restoration for eligible cancellations and failed payments
+
+## Technology stack
+
+| Area | Technologies |
 | --- | --- |
-| Frontend | React 19, TypeScript 7, Vite 8, Tailwind CSS 4, React Router 7, Axios |
-| Backend | Java 21 target, Spring Boot 4.1.1, Spring MVC, Spring Data JPA, Spring Security |
-| Database | PostgreSQL 17, Flyway migrations |
-| Authentication | Server-side session, HttpOnly cookie, BCrypt cost 12, CSRF cookie/header |
-| Testing | JUnit 5, Mockito, MockMvc, Vitest, Testing Library |
-| Delivery | Docker Compose, multi-stage Dockerfiles, Nginx SPA/proxy configuration |
+| Frontend | React 19, TypeScript 7, Vite 8, Tailwind CSS 4 |
+| Routing and data | React Router 7, Axios, React Context API, `localStorage` |
+| Interface | Lucide React icons, responsive CSS, DM Sans and Fraunces typography |
+| Backend | Java 21, Spring Boot 4.1, Spring MVC, Spring Data JPA |
+| Security | Spring Security, server sessions, BCrypt, CSRF protection, CORS |
+| Database | PostgreSQL 17, Hibernate ORM, Flyway migrations, HikariCP |
+| Payments and ordering | PayHere Sandbox Checkout API, WhatsApp `wa.me` integration |
+| Testing | JUnit 5, Mockito, MockMvc, Vitest, Testing Library, H2 test database |
+| Tooling and delivery | Maven, npm, Docker, Docker Compose, Nginx, Railway, Neon |
 
-## Quick start with Docker
+A reusable written description of the stack is available in [TECHNOLOGIES.md](TECHNOLOGIES.md).
 
-Requirements: Docker Desktop with Docker Compose.
+## Architecture
+
+### Production
+
+```text
+Browser
+   |
+   | HTTPS: React routes and /api requests
+   v
+Railway single-container service
+   |
+   |-- React production assets
+   |-- Spring Boot REST API
+   |-- session and CSRF security
+   |-- PayHere callback verification
+   |
+   v
+Neon PostgreSQL
+```
+
+### Local Docker Compose
+
+```text
+Browser
+   |
+   v
+Nginx frontend :5173
+   |
+   | /api proxy
+   v
+Spring Boot :8080
+   |
+   v
+PostgreSQL :5432
+```
+
+The backend follows a layered structure: controllers receive HTTP requests, services enforce business rules and transactions, repositories handle persistence, DTOs define external contracts, and domain entities model the database. Prices and totals supplied by the browser are never trusted.
+
+## Project structure
+
+```text
+Foodorder/
+|-- backend/
+|   |-- src/main/java/com/plateandpantry/
+|   |   |-- config/          Security and application configuration
+|   |   |-- controller/      REST endpoints
+|   |   |-- domain/          JPA entities and enums
+|   |   |-- dto/             Request and response models
+|   |   |-- error/           API exception handling
+|   |   |-- repository/      Spring Data repositories
+|   |   `-- service/         Business and transactional logic
+|   `-- src/main/resources/
+|       `-- db/migration/    Flyway schema and seed data
+|-- frontend/
+|   `-- src/
+|       |-- admin/           Administration interface
+|       |-- components/      Shared UI components
+|       |-- context/         Cart and application state
+|       |-- lib/             API client and helpers
+|       |-- pages/           Customer-facing routes
+|       `-- types/           TypeScript contracts
+|-- scripts/                 Local startup helpers
+|-- docker-compose.yml       Local three-service stack
+`-- Dockerfile               Railway production image
+```
+
+## Getting started
+
+### Prerequisites
+
+- Docker Desktop with Docker Compose
+- Or Java 21, Maven 3.9+, Node.js 24+, npm, and PostgreSQL 17
+- Git
+
+### Option 1: Docker Compose
+
+This is the simplest local workflow.
 
 ```powershell
-cd "C:\My Projects\Foodorder"
+git clone https://github.com/AshenRandira/Foodorder.git
+cd Foodorder
 Copy-Item .env.example .env
 ```
 
-Edit `.env` and replace at least `POSTGRES_PASSWORD`, `ADMIN_PASSWORD`, and `WHATSAPP_BUSINESS_NUMBER`. The admin password must have at least 12 characters. `docker compose` reads this root file for interpolation; it maps the `POSTGRES_*` values into the backend container as `DB_URL`, `DB_USERNAME`, and `DB_PASSWORD`.
+Update the ignored `.env` with a strong PostgreSQL password, an administrator password of at least 12 characters, and a valid international WhatsApp number. Then run:
 
 ```powershell
 docker compose up --build
@@ -59,276 +182,173 @@ Open:
 
 - Storefront: `http://localhost:5173`
 - Admin: `http://localhost:5173/admin/login`
-- Backend API: `http://localhost:8080/api`
+- API: `http://localhost:8080/api`
 
-Stop the stack without deleting database data:
+Stop the application without deleting PostgreSQL data:
 
 ```powershell
 docker compose down
 ```
 
-## Local development without full Docker
+### Option 2: Local development
 
-Start only PostgreSQL from the repository root:
+Start PostgreSQL:
 
 ```powershell
-cd "C:\My Projects\Foodorder"
 docker compose up -d db
 ```
 
-Start Spring Boot in one PowerShell window:
+Start the backend in one terminal:
 
 ```powershell
-cd "C:\My Projects\Foodorder"
 .\scripts\start-backend.ps1
 ```
 
-The launcher imports only the local application variables it needs from the root `.env`, maps `POSTGRES_*` to the backend's `DB_*` variables, and does not import Neon or object-storage credentials. Running `mvn spring-boot:run` directly does **not** load the root `.env`; Spring Boot reads operating-system variables and `application.yml`.
-
-In another PowerShell window:
+Start the frontend in another terminal:
 
 ```powershell
-cd "C:\My Projects\Foodorder\frontend"
-if (-not (Test-Path .env)) { Copy-Item .env.example .env }
+cd frontend
 npm.cmd ci
 npm.cmd run dev
 ```
 
-Vite reads `frontend/.env`, not the root `.env`. Only `VITE_API_URL` is exposed to the browser bundle; never add passwords, merchant secrets, database URLs, or access keys with a `VITE_` prefix.
+The frontend development server runs at `http://localhost:5173` and proxies `/api` to `http://localhost:8080` by default. To preview the local frontend against another backend, set `VITE_API_URL=/api` and `VITE_PROXY_TARGET` only for the local Vite process.
 
-Flyway creates the schema and safely seeds five categories and twelve products on first startup. Seed images use Unsplash delivery URLs; their source URLs are recorded directly in `V2__seed_menu.sql`.
+Flyway creates and validates the database schema and seeds the demonstration menu on first startup. Do not delete the Docker volume unless you intentionally want to remove local database data.
 
-## Environment variables
+## Environment configuration
 
-Never commit a real `.env` file. Example files contain names and safe placeholders only.
+Real credentials belong only in the ignored local `.env` or the hosting platform's secret manager. Never commit them and never expose backend credentials through a `VITE_` variable.
 
-### Loading behavior
+### Core variables
 
-| Runtime | Is the root `.env` loaded? | Configuration path |
+| Variable | Purpose | Local example |
 | --- | --- | --- |
-| Spring Boot started directly | No | Use process environment variables, or use `scripts/start-backend.ps1` for the local Compose database. |
-| Root Docker Compose | Yes | Compose reads it for `${...}` interpolation, initializes PostgreSQL with `POSTGRES_*`, and passes mapped `DB_*` variables to Spring Boot. |
-| Frontend Vite development server | No | Vite reads `frontend/.env`; only `VITE_*` values enter the browser build. |
-| Railway backend container | No | Configure variables in the Railway service. The ignored local `.env` is not in Git and is not uploaded by a GitHub deployment. |
-| Neon CLI and Neon tooling | Yes, when invoked locally | Neon manages `DATABASE_URL`, `DATABASE_URL_UNPOOLED`, `NEON_BRANCH`, and object-storage variables in the root `.env`. |
+| `POSTGRES_DB` | Local Compose database name | `plate_pantry` |
+| `POSTGRES_USER` | Local Compose database user | `plate_pantry` |
+| `POSTGRES_PASSWORD` | Local Compose database password | Strong private value |
+| `DB_URL` | Spring Boot JDBC connection | `jdbc:postgresql://localhost:5432/plate_pantry` |
+| `DB_USERNAME` | Spring datasource user | Private value |
+| `DB_PASSWORD` | Spring datasource password | Private value |
+| `ADMIN_USERNAME` | Initial administrator username | `admin` |
+| `ADMIN_PASSWORD` | Initial administrator password | At least 12 characters |
+| `DEMO_ADMIN_ENABLED` | Creates the public portfolio administrator | `true` |
+| `DEMO_ADMIN_USERNAME` | Public demonstration username | `demo` |
+| `DEMO_ADMIN_PASSWORD` | Public demonstration password | `PlatePantryDemo2026!` |
+| `FRONTEND_ORIGINS` | Exact comma-separated allowed browser origins | `http://localhost:5173` |
+| `SESSION_COOKIE_SECURE` | Restrict the session cookie to HTTPS | `false` locally, `true` in production |
+| `SESSION_COOKIE_SAME_SITE` | Session cookie same-site policy | `lax` |
+| `DELIVERY_FEE_LKR` | Backend-owned delivery fee | `350.00` |
+| `WHATSAPP_BUSINESS_NUMBER` | International digits-only WhatsApp number | `94770000000` |
 
-### Variable ownership
+### PayHere variables
 
-| Variable | Consumer and purpose |
+| Variable | Purpose |
 | --- | --- |
-| `POSTGRES_DB`, `POSTGRES_USER`, `POSTGRES_PASSWORD` | Docker Compose and the local PostgreSQL image. Compose maps them to the backend's `DB_*` variables. Spring Boot does not read `POSTGRES_*` directly. |
-| `DB_URL` | Spring Boot JDBC URL. It must begin with `jdbc:postgresql://`; a Neon `postgresql://` URL cannot be copied unchanged. |
-| `DB_USERNAME`, `DB_PASSWORD` | Spring Boot runtime database credentials. |
-| `DB_POOL_MAX_SIZE` | Maximum Hikari application connections; defaults to `5`. |
-| `FLYWAY_URL`, `FLYWAY_USERNAME`, `FLYWAY_PASSWORD` | Optional direct JDBC connection for schema migration. Each defaults to its corresponding `DB_*` value. |
-| `DATABASE_URL` | Neon CLI-generated pooled PostgreSQL URI. It is supporting-tool configuration and is not consumed directly by this Java application. |
-| `DATABASE_URL_UNPOOLED` | Neon CLI-generated direct PostgreSQL URI. Convert it to JDBC form when configuring `FLYWAY_URL`; do not expose it to the browser. |
-| `NEON_BRANCH` | Neon CLI branch metadata; not consumed by the application. |
-| `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_ENDPOINT_URL_S3`, `AWS_REGION` | Neon Object Storage tooling variables. The current application has no upload/storage consumer, but the variables are retained for the configured private bucket. |
-| `ADMIN_USERNAME`, `ADMIN_PASSWORD` | Creates the first administrator if it does not exist. The password must contain at least 12 characters. |
-| `FRONTEND_ORIGINS` | Comma-separated exact origins allowed to make credentialed CORS requests. Do not use `*`. |
-| `SESSION_COOKIE_SECURE` | Use `false` for local HTTP and `true` behind Railway HTTPS. |
-| `SESSION_COOKIE_SAME_SITE` | Defaults to `lax`; use `none` together with secure cookies only when the frontend and API are genuinely cross-site. |
-| `DELIVERY_FEE_LKR` | Backend-owned non-negative decimal delivery fee, default `350.00`. |
-| `WHATSAPP_BUSINESS_NUMBER` | International digits only, without `+`, spaces, or punctuation, such as `94770000000`. |
-| `PAYHERE_ENABLED` | Explicit payment feature switch. Keep `false` until the registered domain, secret, and public HTTPS callback are valid. |
-| `PAYHERE_MERCHANT_ID` | PayHere merchant ID, backend only. |
-| `PAYHERE_MERCHANT_SECRET` | Domain-specific PayHere secret, backend only. |
-| `PAYHERE_CHECKOUT_URL` | PayHere checkout endpoint; defaults to the Sandbox Checkout URL. |
-| `PAYHERE_NOTIFY_URL` | Public HTTPS callback ending in `/api/payments/payhere/notify`. |
-| `PAYHERE_RETURN_URL` | Browser route ending in `/order/return`. |
-| `PAYHERE_CANCEL_URL` | Browser route ending in `/checkout`. |
-| `PORT` | Backend listener port. Railway supplies this automatically. |
-| `VITE_API_URL` | Public frontend API base; `/api` in the Docker/Nginx build. This must never contain a secret. |
+| `PAYHERE_ENABLED` | Enables checkout only when all Sandbox configuration is ready |
+| `PAYHERE_MERCHANT_ID` | PayHere Sandbox merchant identifier |
+| `PAYHERE_MERCHANT_SECRET` | Domain-specific merchant secret; backend only |
+| `PAYHERE_CHECKOUT_URL` | Sandbox checkout endpoint |
+| `PAYHERE_NOTIFY_URL` | Public server callback ending in `/api/payments/payhere/notify` |
+| `PAYHERE_RETURN_URL` | Browser return route ending in `/order/return` |
+| `PAYHERE_CANCEL_URL` | Browser cancellation route ending in `/checkout` |
 
-The bootstrap process creates an administrator only when the configured username is absent. Changing the environment password later does not silently rotate an existing database password.
+### Configuration loading rules
 
-## Architecture
+- Docker Compose loads the root `.env` and maps `POSTGRES_*` values to the backend's `DB_*` variables.
+- Spring Boot does not automatically load the root `.env`. Use operating-system variables or `scripts/start-backend.ps1`.
+- Vite reads `frontend/.env` and exposes only variables beginning with `VITE_`.
+- Railway does not receive the ignored local `.env`; configure each required variable in the Railway service.
+- Neon CLI variables such as `DATABASE_URL`, `DATABASE_URL_UNPOOLED`, and `NEON_BRANCH` support local tooling and are not read directly by the Spring application.
 
-```text
-Browser
-  |
-  |  React routes, cart state, forms
-  v
-Nginx frontend :5173
-  |
-  |  /api proxy
-  v
-Spring Boot API :8080
-  |-- public menu and token-protected order views
-  |-- transactional checkout and inventory service
-  |-- PayHere signature verification callback
-  |-- session/CSRF protected admin APIs
-  v
-PostgreSQL :5432
-```
+See [.env.example](.env.example) for the complete safe template.
 
-The backend is separated by domain entities, repositories, services, controllers, DTOs, configuration, and consistent error handling. Browser-supplied prices and totals are never accepted.
+## Available commands
 
-### Database relationships
-
-```text
-Category 1 ----- * Product
-CustomerOrder 1 ----- * OrderItem
-CustomerOrder 1 ----- * PaymentAttempt
-AdminUser              independent administrator identity
-```
-
-- `OrderItem` stores product ID, purchased name, unit-price snapshot, quantity, and line total.
-- `CustomerOrder` stores customer delivery data, backend-calculated subtotal, delivery fee, total, payment method, payment status, and fulfilment status.
-- `PaymentAttempt` stores an idempotent provider callback fingerprint and provider outcome.
-- Product and order monetary columns use `NUMERIC(12,2)` and Java `BigDecimal`.
-
-## Order and inventory policy
-
-1. The browser sends only product IDs and quantities. The backend locks products in sorted ID order with `PESSIMISTIC_WRITE`, validates active state and stock, and calculates every amount.
-2. Stock is reserved when either a PayHere order or WhatsApp enquiry is persisted. This prevents a customer from reaching a payment page for stock that was already sold.
-3. A PostgreSQL transaction-scoped advisory lock serializes requests with the same `Idempotency-Key`. A unique database constraint is the second line of defence. Sequential or simultaneous retries return the existing order without deducting stock twice.
-4. PayHere pending status keeps the reservation. Verified success retains it and moves the order from `AWAITING_PAYMENT` to `CONFIRMED`.
-5. Verified PayHere failure or cancellation releases stock exactly once and cancels fulfilment.
-6. A WhatsApp enquiry stays `AWAITING_CONFIRMATION`. Opening WhatsApp does not confirm it. An administrator either confirms it or cancels it; cancellation releases stock once.
-7. An admin cancellation before completion restores stock. A chargeback is recorded separately and does not automatically restock an already sold meal.
-8. A late success callback received after stock was already released is recorded but does not silently mark the order paid; it requires manual reconciliation to avoid overselling.
-
-Automatic reservation expiry is intentionally not included in this assessment build. In a production system, a scheduled job would expire abandoned PayHere reservations and stale WhatsApp enquiries using business-approved time windows.
-
-## Fulfilment lifecycle
-
-Only these transitions are accepted:
-
-```text
-PayHere: AWAITING_PAYMENT --verified payment--> CONFIRMED
-WhatsApp: AWAITING_CONFIRMATION --> CONFIRMED
-CONFIRMED --> PREPARING --> READY --> OUT_FOR_DELIVERY --> COMPLETED
-```
-
-Cancellation is permitted from awaiting, confirmed, preparing, and ready states. Completed and cancelled orders are terminal. `OUT_FOR_DELIVERY` can only become `COMPLETED`. Payment status remains a separate field throughout.
-
-## PayHere Sandbox flow
-
-The integration follows the official [PayHere Checkout API documentation](https://support.payhere.lk/api-%26-mobile-sdk/checkout-api):
-
-1. Customer checkout creates and reserves an order on the backend.
-2. The backend formats the LKR amount to two decimals and generates the required uppercase MD5 hash using merchant ID, order ID, amount, currency, and the hashed merchant secret.
-3. The frontend submits the returned fields directly to `https://sandbox.payhere.lk/pay/checkout` as an HTML form.
-4. PayHere sends an `application/x-www-form-urlencoded` server callback to `PAYHERE_NOTIFY_URL`.
-5. The backend independently verifies `md5sig`, merchant ID, order reference, exact amount, and currency before applying a status.
-6. Callback fingerprints prevent duplicate processing.
-7. Status `2` is success, `0` pending, `-1` cancelled, `-2` failed, and `-3` charged back.
-8. The browser return URL only opens the private order page. It never marks an order paid.
-
-The notification URL must be publicly reachable over HTTPS; localhost cannot receive PayHere callbacks. If credentials or a public HTTPS callback are absent, the UI reports that PayHere is not configured and does not fake a payment.
-
-### Local PayHere test with a Cloudflare Quick Tunnel
-
-The React application is served by the frontend Nginx container on `http://localhost:5173`; Spring Boot does not serve React. Nginx proxies `/api` to the backend container. Expose this combined frontend origin through the Quick Tunnel so checkout starts from the same hostname registered with PayHere and the notification, return, and cancellation routes all work through one public origin.
-
-Install the official `cloudflared` client on Windows if necessary:
+### Frontend
 
 ```powershell
-winget install --id Cloudflare.cloudflared --exact
+cd frontend
+npm.cmd run dev       # Start the Vite development server
+npm.cmd test          # Run Vitest tests
+npm.cmd run build     # Type-check and create the production bundle
+npm.cmd run preview   # Preview the production bundle
 ```
 
-Start the application without deleting its database volume:
+### Backend
 
 ```powershell
-cd "C:\My Projects\Foodorder"
-docker compose up -d --build
+cd backend
+mvn spring-boot:run   # Start Spring Boot using process environment variables
+mvn test              # Run backend tests
+mvn package           # Build the executable JAR
 ```
 
-If another PostgreSQL installation already uses host port `5432`, set `POSTGRES_PORT=5433` in the ignored root `.env`. Spring still reaches the Compose database on its internal port `5432`.
-
-Start a public Quick Tunnel in a separate terminal:
+### Complete stack
 
 ```powershell
-cloudflared tunnel --url http://localhost:5173
+docker compose up --build
+docker compose ps
+docker compose down
 ```
 
-Do not use `--allowed-mail` or another interactive authentication layer for this callback tunnel. Copy the generated hostname without `https://` or a path, such as `random-words.trycloudflare.com`, into **PayHere Sandbox → Integrations → Add Domain/App → Domain**. Copy the domain-specific Merchant Secret into the ignored root `.env`; never place it in source, documentation, chat, or a `VITE_*` variable. Open the public tunnel URL, rather than localhost, when initiating the PayHere test because PayHere validates the checkout origin against the registered domain.
+## API overview
 
-Configure the ignored root `.env` using these exact names and URL shapes:
-
-```dotenv
-PAYHERE_ENABLED=true
-PAYHERE_MERCHANT_ID=your-sandbox-merchant-id
-PAYHERE_MERCHANT_SECRET=your-domain-specific-sandbox-secret
-PAYHERE_CHECKOUT_URL=https://sandbox.payhere.lk/pay/checkout
-PAYHERE_NOTIFY_URL=https://random-words.trycloudflare.com/api/payments/payhere/notify
-PAYHERE_RETURN_URL=https://random-words.trycloudflare.com/order/return
-PAYHERE_CANCEL_URL=https://random-words.trycloudflare.com/checkout
-FRONTEND_ORIGINS=http://localhost:5173,https://random-words.trycloudflare.com
-SESSION_COOKIE_SECURE=false
-SESSION_COOKIE_SAME_SITE=lax
-```
-
-Restart only the backend after changing those values:
-
-```powershell
-docker compose up -d --no-deps --force-recreate backend
-```
-
-Every new Quick Tunnel normally gets a different hostname. When it changes, register the new hostname with PayHere, obtain/use the secret for that domain, update `PAYHERE_NOTIFY_URL`, `PAYHERE_RETURN_URL`, `PAYHERE_CANCEL_URL`, and `FRONTEND_ORIGINS`, then restart the backend again.
-
-To test a successful simulated Sandbox payment:
-
-1. Open the generated `https://random-words.trycloudflare.com` URL, add an in-stock product, and continue to checkout.
-2. Enter valid delivery details and an email address, select PayHere, and continue.
-3. Confirm the browser is redirected to `https://sandbox.payhere.lk/pay/checkout`.
-4. Use PayHere's published successful Visa test card `4916217501611292`; use any valid future expiry, valid CVV, and cardholder name. Never use a real card.
-5. After PayHere returns to `/order/return`, refresh the order status. It must show paid only after the signed server callback has updated the database.
-6. Confirm the same order in the admin dashboard. A browser return without the signed callback must remain `AWAITING_PAYMENT`.
-
-For a simulated failure check, use a decline card from the official [PayHere Sandbox testing page](https://support.payhere.lk/sandbox-and-testing), then verify that the order is failed/cancelled and inventory is released exactly once. Automated tests also cover rejected signatures, amount mismatch, currency mismatch, duplicate callbacks, verified cancellation, verified failure, and inventory release.
-
-A Quick Tunnel temporarily exposes the local frontend and its proxied backend routes to the public Internet, has no uptime guarantee, and stops when `cloudflared` stops. Use it only for local testing and do not use the public URL for admin work.
-
-## WhatsApp flow
-
-The backend builds the WhatsApp message only after recalculating and persisting the order. It includes reference, item quantities, unit-derived line totals, subtotal, delivery fee, total, customer phone, address, and notes. The frontend opens the configured `wa.me` URL and tells the customer to press Send. The order stays awaiting business confirmation until an administrator explicitly advances it.
-
-## Security decisions
-
-- Every `/api/admin/**` route except login/session bootstrap is role protected on the backend.
-- Passwords use BCrypt with cost 12; plaintext credentials are never stored.
-- Authentication uses a server-side session with an HttpOnly, `SameSite=Lax` cookie. Set `SESSION_COOKIE_SECURE=true` in production.
-- Admin mutations require CSRF validation through the `XSRF-TOKEN` cookie and `X-XSRF-TOKEN` header.
-- Public order creation and token-protected lookup do not rely on cookie authentication. The PayHere notification route is the only payment CSRF exemption and is protected with provider signature verification.
-- CORS allows credentials only from `FRONTEND_ORIGINS`; it is not wildcard based.
-- Login attempts are blocked for 15 minutes after five failures for the username/IP key.
-- Jakarta validation rejects malformed customer, catalogue, quantity, and status data.
-- Public order lookup requires a 256-bit random access token, preventing enumerable references from exposing customer data.
-- Error responses are consistent and contain no stack traces. Unexpected errors are logged server-side.
-- Merchant secrets remain backend environment variables and are never sent to the frontend; only the per-order hash is returned.
-
-Deploy behind HTTPS and a trusted reverse proxy. Terminate TLS at the platform/load balancer, forward the original protocol, set secure cookies, restrict CORS to the exact frontend origin, use a managed PostgreSQL TLS connection, and inject all secrets from the deployment platform's secret manager.
-
-## API outline
-
-| Method | Path | Access |
+| Method | Endpoint | Access |
 | --- | --- | --- |
 | `GET` | `/api/menu/categories` | Public |
-| `GET` | `/api/menu/products`, `/api/menu/products/{id}` | Public |
-| `POST` | `/api/orders` | Public, requires `Idempotency-Key` |
-| `GET` | `/api/orders/{reference}?token=...` | Private token |
+| `GET` | `/api/menu/products` | Public |
+| `GET` | `/api/menu/products/{id}` | Public |
+| `POST` | `/api/orders` | Public; requires `Idempotency-Key` |
+| `GET` | `/api/orders/{reference}?token=...` | Private order token |
+| `GET` | `/api/config` | Public frontend configuration |
 | `POST` | `/api/payments/payhere/notify` | Public provider callback with signature verification |
-| `GET` | `/api/csrf` | Public token bootstrap |
-| `POST` | `/api/admin/auth/login`, `/logout` | Login public; logout authenticated + CSRF |
-| `GET/POST/PUT/PATCH` | `/api/admin/categories`, `/products` | Admin session + CSRF for mutations |
-| `GET/PATCH` | `/api/admin/orders` | Admin session + CSRF for mutation |
-| `GET` | `/api/admin/dashboard` | Admin session |
+| `GET` | `/api/csrf` | Public CSRF bootstrap |
+| `POST` | `/api/admin/auth/login` | Public login endpoint |
+| `POST` | `/api/admin/auth/logout` | Authenticated and CSRF protected |
+| `GET` | `/api/admin/dashboard` | Administrator session |
+| `GET/POST/PUT/PATCH` | `/api/admin/categories`, `/api/admin/products` | Administrator session and CSRF for mutations |
+| `GET/PATCH` | `/api/admin/orders` | Administrator session and CSRF for mutations |
 
-## Tests and builds
+## Order and payment design
 
-Run backend tests:
+1. The frontend sends product identifiers and quantities, not trusted prices.
+2. The backend locks products, checks availability and stock, and calculates all monetary values with `BigDecimal`.
+3. An `Idempotency-Key` and database constraint prevent retrying checkout from creating duplicate orders or deducting stock twice.
+4. Stock is reserved when a PayHere or WhatsApp order is persisted.
+5. PayHere generates a redirect request using a backend-created hash.
+6. Only a valid server callback can mark a PayHere order as paid. The browser return page cannot change payment status.
+7. The callback handler verifies the signature, merchant, order reference, amount, and currency.
+8. Callback fingerprints make repeated provider notifications idempotent.
+9. Verified failure or cancellation releases stock exactly once.
+10. WhatsApp orders remain awaiting confirmation until an administrator accepts them.
+
+## Security
+
+- Server-side administrator sessions with `HttpOnly` cookies
+- Secure cookies in deployed HTTPS environments
+- BCrypt password hashing with cost 12
+- CSRF cookie/header validation for authenticated mutations
+- Exact-origin credentialed CORS; wildcard origins are not used
+- Role protection for administration endpoints
+- Login throttling after repeated failures
+- Jakarta Bean Validation for API requests
+- Token-protected customer order lookup
+- Backend-owned totals and inventory validation
+- PayHere callback signature and value verification
+- Secrets excluded from Git, Docker build context, frontend bundles, and API responses
+- Safe API errors without stack traces or credentials
+
+## Testing
+
+Run all backend tests:
 
 ```powershell
 cd backend
 mvn test
 ```
 
-Coverage focuses on backend-owned totals, combined quantity limits, insufficient inventory, row-lock usage, duplicate checkout reuse, invalid status transitions, PayHere signature/amount/currency verification, duplicate callback handling, anonymous admin rejection, authenticated dashboard access, and CSRF enforcement.
-
-Run frontend tests and the production build:
+Run frontend tests and a production build:
 
 ```powershell
 cd frontend
@@ -336,79 +356,51 @@ npm.cmd test
 npm.cmd run build
 ```
 
-Verified locally on 2026-10-10:
+The automated suite covers checkout calculations, inventory validation, idempotency, status transitions, PayHere signature and value checks, duplicate callbacks, cancellation and failure behavior, admin authorization, and CSRF enforcement. Frontend tests cover core rendering and customer interactions.
 
-- Backend: 15 tests passed, 0 failures, 0 errors.
-- Frontend: 2 tests passed in 1 test file.
-- Frontend production build: successful; 1,977 modules transformed.
-- Docker Compose configuration: valid.
-- Clean Docker images: backend and frontend built successfully.
-- PostgreSQL 17 container: healthy; both Flyway migrations applied successfully.
-- Backend and frontend containers: healthy/running.
-- Live Nginx URL returned HTTP 200 and the Plate & Pantry document title.
-- Live menu returned 12 seeded products.
-- Live WhatsApp checkout persisted a backend-calculated LKR 3,250.00 order.
-- Repeating the same checkout key returned the same reference and did not deduct stock again.
-- Token-protected order lookup returned the same order.
-- Live admin login established a server session and the dashboard returned the persisted order count.
-- Malformed live checkout JSON returned a safe HTTP 400 response rather than a stack trace.
-- With no merchant credentials, live PayHere checkout reported `configured: false`, omitted the hash, and left the order awaiting payment.
-- Anonymous access to the live admin dashboard returned HTTP 401.
-- Railway single-container image built successfully from the repository root.
-- The production image returned HTTP 200 for `/`, `/menu/1`, `/order/return`, `/admin/login`, `/api/config`, and `/api/menu/categories`.
-- The production image returned HTTP 401 for an anonymous `/api/admin/dashboard` request.
-- With `PAYHERE_ENABLED=false`, a PayHere order request returned HTTP 503 and the database order count remained unchanged.
+Before a release, also verify:
 
-Visual browser QA remains unverified because the available browser-control connector and Windows automation pipe were unavailable in this session. The responsive code was production-built, but the final submission should still be manually checked at common mobile, tablet, and desktop widths.
+- Responsive layouts at mobile, tablet, and desktop widths
+- Menu, cart, checkout, and order tracking
+- Administrator login and protected routes
+- Direct navigation to React routes
+- Database migrations against a clean test database
+- A real PayHere Sandbox callback before claiming end-to-end payment success
 
 ## Deployment
 
-### Railway single-container application
+The root [Dockerfile](Dockerfile) performs a multi-stage production build:
 
-The root `Dockerfile` builds React with `VITE_API_URL=/api`, copies the production assets into Spring Boot, and serves the UI and API from one Railway HTTPS origin. Keep the Railway service root directory empty (repository root). Railway detects the root `Dockerfile`; no separate frontend service is needed.
+1. Node builds the React application with `VITE_API_URL=/api`.
+2. Maven packages the Spring Boot application and includes the frontend assets.
+3. A small Java 21 runtime image starts the complete application on Railway's `PORT`.
 
-Railway does not load the ignored local `.env` during a GitHub deployment. Add these service variables explicitly:
+For Railway:
 
-| Variable | Railway value |
-| --- | --- |
-| `DB_URL` | Neon pooled JDBC URL: `jdbc:postgresql://<pooled-host>/<database>?sslmode=require` |
-| `DB_USERNAME`, `DB_PASSWORD` | Neon role and password, stored as Railway secrets |
-| `DB_POOL_MAX_SIZE` | `5` for the current small deployment |
-| `FLYWAY_URL` | Neon direct JDBC URL: `jdbc:postgresql://<direct-host>/<database>?sslmode=require` |
-| `FLYWAY_USERNAME`, `FLYWAY_PASSWORD` | The Neon migration role and password; they may match the runtime role for this assessment |
-| `ADMIN_USERNAME`, `ADMIN_PASSWORD` | Demonstration administrator; use a password of at least 12 characters |
-| `FRONTEND_ORIGINS` | Exact deployed frontend HTTPS origin, or a comma-separated list of exact origins |
-| `SESSION_COOKIE_SECURE` | `true` |
-| `SESSION_COOKIE_SAME_SITE` | `lax` for same-site deployment; `none` only for a genuinely cross-site frontend/API pair |
-| `DELIVERY_FEE_LKR` | Confirmed decimal delivery fee, currently `350.00` |
-| `WHATSAPP_BUSINESS_NUMBER` | Confirmed international digits-only number |
-| `PAYHERE_ENABLED` | `false` for the public Railway demo until an approved domain is available |
-| `PAYHERE_MERCHANT_ID`, `PAYHERE_MERCHANT_SECRET` | Sandbox credentials, only when `PAYHERE_ENABLED=true` |
-| `PAYHERE_CHECKOUT_URL` | `https://sandbox.payhere.lk/pay/checkout` |
-| `PAYHERE_NOTIFY_URL` | `https://<api-domain>/api/payments/payhere/notify` |
-| `PAYHERE_RETURN_URL` | `https://<frontend-domain>/order/return` |
-| `PAYHERE_CANCEL_URL` | `https://<frontend-domain>/checkout` |
+- Deploy from the repository root and let Railway detect the root Dockerfile.
+- Use a Neon pooled JDBC hostname for `DB_URL`.
+- Use the Neon direct hostname for `FLYWAY_URL`.
+- Retain `sslmode=require` for both database connections.
+- Set `FRONTEND_ORIGINS` to the exact Railway HTTPS origin.
+- Set `SESSION_COOKIE_SECURE=true` and `SESSION_COOKIE_SAME_SITE=lax`.
+- Configure the health check as `/api/menu/categories`.
+- Keep PayHere disabled until the public domain is registered and the matching secret and callback URLs are configured.
+- Keep `DEMO_ADMIN_ENABLED=true` for the portfolio demonstration, or disable it when the site is used with real customer data.
+- Keep the application at one replica while sessions remain in application memory.
 
-Do not copy `DATABASE_URL` directly into `DB_URL`: Neon emits a `postgresql://` URI containing credentials, while the PostgreSQL JDBC driver requires `jdbc:postgresql://` and this application supplies username and password separately. Use the pooled Neon host for `DB_URL` and the direct host for `FLYWAY_URL`. Keep `sslmode=require`. Do not configure `POSTGRES_*`, `DATABASE_URL*`, `NEON_BRANCH`, or `AWS_*` in Railway unless a separate runtime feature actually consumes them.
+## Known limitations
 
-After the first successful deployment, generate a Railway public domain. Set `FRONTEND_ORIGINS` to that exact `https://...` origin, keep `SESSION_COOKIE_SECURE=true` and `SESSION_COOKIE_SAME_SITE=lax`, then redeploy. Configure the health-check path as `/api/menu/categories`. Keep the service to one instance unless sessions are stored in a shared session store or Railway traffic is made sticky.
+- PayHere requires an accepted registered domain; temporary Cloudflare subdomains may be rejected.
+- The public demonstration currently keeps PayHere disabled and leaves WhatsApp ordering available.
+- Customer accounts, discounts, taxes, refunds, live driver tracking, and automatic reservation expiry are outside the current scope.
+- Paid-order cancellation records the fulfilment result but does not automatically call a refund API.
+- Horizontal scaling requires shared Spring Session storage or sticky sessions.
+- Seed images are delivered from external image URLs and therefore require internet access.
 
-PayHere Sandbox is implemented and its signature, amount, currency, failure, cancellation, and duplicate-callback behavior is covered by automated tests. PayHere Sandbox rejected the temporary `trycloudflare.com` hostname because subdomains are not accepted for domain registration. The public demo therefore exposes the tested integration as unavailable and keeps WhatsApp ordering functional; it does not fake payment success. When an approved apex domain is available, set `PAYHERE_ENABLED=true`, register that hostname in PayHere Sandbox, use its domain-specific Merchant Secret, update the three PayHere URLs to the same public origin, and redeploy.
+## Author
 
-Before presenting the deployment:
+Developed by [Ashen Randira](https://github.com/AshenRandira).
 
-1. Confirm `GET /api/menu/categories` through the public HTTPS API.
-2. Confirm the browser sends the admin session and CSRF cookies in the selected same-site or cross-site topology.
-3. Confirm direct requests to `/menu/1`, `/order/return`, and `/admin/login` return the React application.
-4. Verify a real PayHere Sandbox callback in provider logs and the database before presenting payment as tested.
+## License
 
-The source repository is `https://github.com/AshenRandira/Foodorder`. The live Railway URL must be added here after the service is online and its smoke tests pass.
-
-## Assumptions and limitations
-
-- Delivery is a flat LKR 350 for the assessment; zones and distance pricing are out of scope.
-- Customer accounts, promotions, taxes, refunds, delivery-driver tracking, and reservation expiry jobs are out of scope.
-- Admin cancellation of a paid order records fulfilment cancellation but does not call a PayHere refund API; refund reconciliation is manual.
-- Seed images are remotely hosted by Unsplash and require internet access. The product card includes a sensible fallback image.
-- Horizontal scaling requires a shared Spring Session store or sticky sessions because authentication is server-session based.
-- Live URLs and the GitHub repository URL must be supplied after the owner explicitly chooses hosting and publishing targets.
+This repository was created as a software engineering assessment and portfolio project. Add an explicit open-source license before redistributing or accepting third-party contributions.

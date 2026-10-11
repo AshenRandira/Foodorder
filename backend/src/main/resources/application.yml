@@ -38,6 +38,10 @@ app:
   admin:
     username: ${ADMIN_USERNAME:}
     password: ${ADMIN_PASSWORD:}
+  demo-admin:
+    enabled: ${DEMO_ADMIN_ENABLED:true}
+    username: ${DEMO_ADMIN_USERNAME:demo}
+    password: ${DEMO_ADMIN_PASSWORD:PlatePantryDemo2026!}
   whatsapp-number: ${WHATSAPP_BUSINESS_NUMBER:94770000000}
   payhere:
     enabled: ${PAYHERE_ENABLED:false}

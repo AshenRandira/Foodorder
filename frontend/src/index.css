@@ -1,43 +1,67 @@
 @import "tailwindcss";
 
 @theme {
-  --color-cream-50: #fffdf7;
-  --color-cream-100: #f8f2e7;
-  --color-cream-200: #eee1ce;
-  --color-forest-700: #334235;
-  --color-forest-800: #253127;
-  --color-forest-900: #18211a;
-  --color-orange-500: #de6b28;
-  --color-orange-600: #c9571b;
-  --color-sage-100: #e5ebe0;
-  --font-sans: "Manrope", "Segoe UI", sans-serif;
-  --font-display: "Georgia", "Times New Roman", serif;
+  --color-cream-50: #fffaf2;
+  --color-cream-100: #f8efdf;
+  --color-cream-200: #ead9be;
+  --color-forest-700: #285247;
+  --color-forest-800: #1d4137;
+  --color-forest-900: #123229;
+  --color-orange-400: #f48950;
+  --color-orange-500: #e8612a;
+  --color-orange-600: #c94a1b;
+  --color-sage-100: #e4eee5;
+  --color-sage-200: #c9ddcd;
+  --color-saffron-400: #f4b740;
+  --font-sans: "DM Sans", "Segoe UI", sans-serif;
+  --font-display: "Fraunces", "Georgia", serif;
 }
 
 @layer base {
   * { box-sizing: border-box; }
   html { scroll-behavior: smooth; }
-  body { margin: 0; min-width: 320px; background: #fffdf7; color: #18211a; font-family: var(--font-sans); }
+  body { margin: 0; min-width: 320px; background: #fffaf2; color: #123229; font-family: var(--font-sans); }
   button, input, textarea, select { font: inherit; }
   button, a { -webkit-tap-highlight-color: transparent; }
   img { display: block; }
+  ::selection { background: rgba(244, 183, 64, .45); color: #123229; }
   :focus-visible { outline: 3px solid rgba(222, 107, 40, .35); outline-offset: 3px; }
 }
 
 @layer components {
   .container-shell { @apply mx-auto w-full max-w-7xl px-5 sm:px-8 lg:px-10; }
-  .display-title { @apply font-display text-4xl leading-tight tracking-[-0.03em] text-forest-900 sm:text-5xl lg:text-6xl; }
-  .section-title { @apply font-display text-3xl tracking-[-0.02em] text-forest-900 sm:text-4xl; }
-  .eyebrow { @apply text-xs font-bold uppercase tracking-[0.2em] text-orange-600; }
-  .btn-primary { @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-orange-500 px-6 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-orange-600 disabled:cursor-not-allowed disabled:opacity-50; }
-  .btn-secondary { @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-forest-900/15 bg-white px-6 py-3 text-sm font-bold text-forest-900 transition hover:border-orange-500 hover:text-orange-600 disabled:cursor-not-allowed disabled:opacity-50; }
-  .field { @apply w-full rounded-2xl border border-forest-900/15 bg-white px-4 py-3 text-sm text-forest-900 placeholder:text-forest-900/40 focus:border-orange-500 focus:outline-none; }
+  .display-title { @apply font-display text-4xl font-semibold leading-[1.05] tracking-[-0.045em] text-forest-900 sm:text-5xl lg:text-7xl; }
+  .section-title { @apply font-display text-3xl font-semibold leading-tight tracking-[-0.035em] text-forest-900 sm:text-5xl; }
+  .eyebrow { @apply text-[11px] font-bold uppercase tracking-[0.24em] text-orange-600; }
+  .btn-primary { @apply inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-orange-500 px-7 py-3.5 text-sm font-bold text-white shadow-[0_12px_28px_rgba(232,97,42,.24)] transition duration-300 hover:-translate-y-0.5 hover:bg-orange-600 hover:shadow-[0_16px_34px_rgba(232,97,42,.3)] disabled:cursor-not-allowed disabled:opacity-50; }
+  .btn-secondary { @apply inline-flex min-h-12 items-center justify-center gap-2 rounded-full border border-forest-900/15 bg-white/80 px-7 py-3.5 text-sm font-bold text-forest-900 shadow-sm backdrop-blur transition duration-300 hover:-translate-y-0.5 hover:border-orange-500 hover:text-orange-600 disabled:cursor-not-allowed disabled:opacity-50; }
+  .field { @apply w-full rounded-2xl border border-forest-900/12 bg-white px-4 py-3.5 text-sm text-forest-900 shadow-[0_8px_24px_rgba(18,50,41,.04)] placeholder:text-forest-900/35 focus:border-orange-500 focus:outline-none focus:ring-4 focus:ring-orange-500/10; }
   .label { @apply mb-2 block text-sm font-bold text-forest-900; }
-  .card { @apply rounded-3xl border border-forest-900/8 bg-white shadow-[0_20px_60px_rgba(24,33,26,0.07)]; }
+  .card { @apply rounded-3xl border border-forest-900/8 bg-white shadow-[0_24px_70px_rgba(18,50,41,.08)]; }
   .admin-card { @apply rounded-2xl border border-slate-200 bg-white p-5 shadow-sm; }
 }
 
 .hero-grid {
-  background-image: linear-gradient(rgba(255,253,247,.9), rgba(255,253,247,.9)), radial-gradient(circle at 1px 1px, #de6b2830 1px, transparent 0);
-  background-size: auto, 24px 24px;
+  background:
+    radial-gradient(circle at 82% 18%, rgba(244,183,64,.22), transparent 28%),
+    radial-gradient(circle at 8% 72%, rgba(201,221,205,.5), transparent 25%),
+    linear-gradient(135deg, #fffaf2 0%, #fbf2e3 55%, #f4e8d4 100%);
+}
+
+.menu-hero {
+  background:
+    radial-gradient(circle at 90% 0%, rgba(244,183,64,.2), transparent 28%),
+    linear-gradient(135deg, #123229 0%, #1d4a3d 100%);
+}
+
+.noise-overlay { position: relative; isolation: isolate; }
+.noise-overlay::after {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  content: "";
+  opacity: .22;
+  background-image: radial-gradient(circle at 1px 1px, rgba(255,255,255,.4) 1px, transparent 0);
+  background-size: 24px 24px;
+  pointer-events: none;
 }
