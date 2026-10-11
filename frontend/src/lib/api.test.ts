@@ -9,6 +9,10 @@ describe('API CSRF handling', () => {
     api.defaults.adapter = originalAdapter
   })
 
+  it('keeps automatic browser XSRF replacement disabled', () => {
+    expect(api.defaults.withXSRFToken).toBe(false)
+  })
+
   it('adds the token returned by the CSRF endpoint to mutation requests', async () => {
     const requests: InternalAxiosRequestConfig[] = []
     const adapter: AxiosAdapter = async config => {
