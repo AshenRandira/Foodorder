@@ -9,7 +9,22 @@ export const api = axios.create({
   xsrfHeaderName: 'X-XSRF-TOKEN',
 })
 
-export const ensureCsrf = async () => { await api.get('/csrf') }
+type CsrfResponse = { headerName: string; parameterName: string; token: string }
+let csrfHeaderName = 'X-XSRF-TOKEN'
+let csrfToken: string | null = null
+
+api.interceptors.request.use(config => {
+  if (csrfToken && !['get', 'head', 'options'].includes(config.method?.toLowerCase() || 'get')) {
+    config.headers.set(csrfHeaderName, csrfToken)
+  }
+  return config
+})
+
+export const ensureCsrf = async () => {
+  const response = await api.get<CsrfResponse>('/csrf')
+  csrfHeaderName = response.data.headerName
+  csrfToken = response.data.token
+}
 export const errorMessage = (error: unknown, fallback = 'Something went wrong. Please try again.') => {
   const data = (error as AxiosError<ApiError>)?.response?.data
   return data?.message || fallback
